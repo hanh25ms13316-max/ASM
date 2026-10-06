@@ -1,0 +1,10 @@
+flowchart LR
+  ex["extract_data"] --> va{"validate_data<br/>(branch)"}
+  va -- "valid" --> bf["build_features"]
+  va -- "invalid" --> fb["fallback_rule"]
+  bf --> sc["score_students<br/>(champion)"]
+  sc --> as["assign_tiers<br/>none_failed_min_one_success"]
+  fb --> as
+  bf --> cd{"check_drift<br/>(branch)"}
+  cd -- "PSI > 0.2" --> tr["trigger_retraining"]
+  cd -- "PSI ≤ 0.2" --> nd["no_drift"]

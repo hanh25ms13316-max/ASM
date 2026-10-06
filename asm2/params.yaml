@@ -1,0 +1,57 @@
+# Central configuration for the dropout early-warning pipeline.
+# Every tunable value lives here so that a run is fully described by
+# (git commit, data hash, this file).
+
+project:
+  name: dropout-early-warning
+  seed: 42
+
+data:
+  raw_path: data/raw/students.csv
+  separator: ";"
+  target_column: Target
+  positive_label: Dropout          # label 1 = student drops out
+  test_size: 0.20                  # final hold-out, used once for the champion
+  val_size: 0.20                   # used for model selection
+  max_missing_ratio: 0.05          # validation gate
+  min_rows: 1000
+
+features:
+  # Attributes never used as model inputs (kept only for fairness audit).
+  sensitive: [Gender, Nacionality, Marital status, International]
+  fairness_attribute: Gender
+  # Feature groups let experiments simulate "how early" we predict.
+  groups:
+    enrollment: [Application mode, Application order, Course, Daytime/evening attendance,
+                 Previous qualification, Previous qualification (grade), Mother's qualification,
+                 Father's qualification, Mother's occupation, Father's occupation, Admission grade,
+                 Displaced, Educational special needs, Scholarship holder, Age at enrollment,
+                 Unemployment rate, Inflation rate, GDP]
+    financial: [Debtor, Tuition fees up to date]
+    semester1: [Curricular units 1st sem (credited), Curricular units 1st sem (enrolled),
+                Curricular units 1st sem (evaluations), Curricular units 1st sem (approved),
+                Curricular units 1st sem (grade), Curricular units 1st sem (without evaluations)]
+    semester2: [Curricular units 2nd sem (credited), Curricular units 2nd sem (enrolled),
+                Curricular units 2nd sem (evaluations), Curricular units 2nd sem (approved),
+                Curricular units 2nd sem (grade), Curricular units 2nd sem (without evaluations)]
+
+evaluation:
+  tier_a_fraction: 0.10            # advisors contact the top 10 %
+  tier_b_fraction: 0.25            # care team covers up to the top 25 %
+  primary_metric: pr_auc
+  cv_folds: 5
+
+selection:
+  # From Assignment 1, trade-off 5.1: a complex model must beat the simple,
+  # explainable baseline by a clear margin, otherwise keep the baseline.
+  simple_baseline: E02
+  min_gain_over_baseline: 0.02
+
+quality_gate:
+  min_pr_auc: 0.80                 # proxy dataset (base rate ~32 %)
+  max_fairness_gap: 0.10           # recall gap between groups at top 25 %
+  max_regression_vs_champion: 0.01
+
+mlflow:
+  experiment_name: dropout-early-warning
+  registered_model: dropout-risk

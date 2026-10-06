@@ -1,0 +1,30 @@
+flowchart TB
+  subgraph S1["1 · Ingestion"]
+    A1["Nightly export<br/>SIS · LMS · attendance · finance · call log"] --> A2["Dated snapshot<br/>+ SHA-256 hash"]
+  end
+  subgraph S2["2 · Validation (quality gate)"]
+    B1{"Schema · ranges ·<br/>missing ≤ 5% · rows ≥ 1000"}
+  end
+  subgraph S3["3 · Preprocessing"]
+    C1["Binary label<br/>Dropout = 1"] --> C2["Stratified split 60/20/20<br/>seed = 42"]
+  end
+  subgraph S4["4 · Feature engineering"]
+    D1["Select feature groups<br/>drop sensitive attributes"] --> D2["Ratios & trends<br/>approval_rate, grade_trend"] --> D3["One-hot + scaling<br/>(ColumnTransformer)"]
+  end
+  subgraph S5["5 · Training"]
+    E1["12 configurations E01–E12<br/>each = 1 MLflow run"]
+  end
+  subgraph S6["6 · Evaluation"]
+    F1["PR-AUC · Recall@10/25% · Brier ·<br/>ECE · fairness gap · CV ± SD"] --> F2{"Quality gate +<br/>selection rule"}
+  end
+  subgraph S7["7 · Deployment"]
+    G1[("Registry<br/>alias challenger")] --> G2{"Human<br/>approval"} --> G3[("alias champion")] --> G4["Weekly batch scoring<br/>Tier A / Tier B lists"]
+  end
+  A2 -- "raw CSV" --> B1
+  B1 -- "valid DataFrame" --> C1
+  B1 -- "fail" --> X["Stop · alert ·<br/>fallback rule B2"]
+  C2 -- "train / val / test" --> D1
+  D3 -- "feature matrix" --> E1
+  E1 -- "fitted pipelines" --> F1
+  F2 -- "pass" --> G1
+  F2 -- "fail" --> Y["Keep current champion<br/>log reasons"]

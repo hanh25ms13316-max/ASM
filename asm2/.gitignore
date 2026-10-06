@@ -1,0 +1,7 @@
+mlflow.db
+mlartifacts/
+mlruns/
+.env
+__pycache__/
+*.pyc
+data/raw/*.csv

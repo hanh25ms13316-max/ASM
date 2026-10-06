@@ -1,0 +1,2 @@
+flowchart LR
+  s["snapshot_labelled_data"] --> v["validate_training_data"] --> t["train_and_track_experiments<br/>(12 MLflow runs, gate, register)"] --> a["await_human_approval"]

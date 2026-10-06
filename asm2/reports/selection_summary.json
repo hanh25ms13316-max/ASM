@@ -1,0 +1,25 @@
+{
+  "selected": "E02",
+  "top_by_pr_auc": "E09",
+  "gate_passed": true,
+  "reasons": [],
+  "tuned_hyperparams": {
+    "subsample": 0.8,
+    "n_estimators": 500,
+    "min_child_weight": 3,
+    "max_depth": 3,
+    "learning_rate": 0.05,
+    "colsample_bytree": 0.9
+  },
+  "test_metrics": {
+    "pr_auc": 0.9005,
+    "roc_auc": 0.9317,
+    "recall_at_10": 0.3063,
+    "precision_at_10": 0.9886,
+    "recall_at_25": 0.7042,
+    "fairness_gap_at_25": 0.0731,
+    "brier": 0.0858,
+    "ece": 0.0247
+  },
+  "model_version": "1"
+}
